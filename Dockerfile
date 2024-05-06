@@ -1,12 +1,11 @@
-FROM debian:bookworm as builder
-
-RUN apt-get update && apt-get install git build-essential golang-go -y
+FROM golang:1.22-bookworm@sha256:d0902bacefdde1cf45528c098d14e55d78c107def8a22d148eabd71582d7a99f as builder
 
 WORKDIR /app
 
 COPY . /app/
 
-RUN go build
+RUN go version \
+  && go build
 
 # TODO: Add a multi-stage build to reduce the size of the final image
 
