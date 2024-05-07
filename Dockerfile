@@ -7,8 +7,6 @@ COPY . /app/
 RUN go version \
   && go build
 
-# TODO: Add a multi-stage build to reduce the size of the final image
-
 # The runtime image, used to just run the code provided its virtual environment
 FROM scratch
 

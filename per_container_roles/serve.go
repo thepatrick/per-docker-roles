@@ -18,7 +18,7 @@ import (
 	"github.com/docker/docker/client"
 )
 
-const LocalHostAddress = "10.2.10.246" // this will need to allow for the containers instead
+const DefaultLocalHostAddress = "127.0.0.1"
 const DefaultPort = 9912
 
 var RefreshTime = time.Minute * time.Duration(5)
@@ -85,7 +85,7 @@ func GetRemoteIP(r *http.Request) (string, error) {
 	// remoteIP := strings.Split(r.RemoteAddr, ":")[0]
 }
 
-func Serve(port int) {
+func Serve(port int, listenAddress string) {
 	// todo: specify the network name
 	endpoint := &Endpoint{PortNum: port, NetworkID: "bridge", ByContainer: make(map[string]*ContainerWithCreds)}
 	endpoint.Server = &http.Server{}
@@ -115,7 +115,7 @@ func Serve(port int) {
 	http.HandleFunc(SECURITY_CREDENTIALS_RESOURCE_PATH, getRoleNameHandler)
 	http.HandleFunc(SECURITY_CREDENTIALS_RESOURCE_PATH+"{roleName}", getCredentialsHandler)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", LocalHostAddress, endpoint.PortNum))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", listenAddress, endpoint.PortNum))
 	if err != nil {
 		log.Println("failed to create listener")
 		os.Exit(1)
@@ -123,7 +123,7 @@ func Serve(port int) {
 	endpoint.PortNum = listener.Addr().(*net.TCPAddr).Port
 	log.Println("Local server started on port:", endpoint.PortNum)
 	log.Println("Make it available to the sdk by running:")
-	log.Printf("export AWS_EC2_METADATA_SERVICE_ENDPOINT=http://%s:%d/", LocalHostAddress, endpoint.PortNum)
+	log.Printf("export AWS_EC2_METADATA_SERVICE_ENDPOINT=http://%s:%d/", listenAddress, endpoint.PortNum)
 	if err := endpoint.Server.Serve(listener); err != nil {
 		log.Println("Httpserver: ListenAndServe() error")
 		os.Exit(1)

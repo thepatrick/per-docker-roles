@@ -43,8 +43,8 @@ docker inspect --format '{{.Id}} {{.NetworkSettings.Networks.traefik_default.IPA
 
 These are currently littered through the codebase. 
 
-- [ ] script building arm64 for linux builds
-- [ ] github actions build and add as a release
-- [ ] add ansible stuff to nyx
-- [ ] ansible: pull a release of the aws cred helper, run with systemd
+- [x] script building arm64 for linux builds
+- [x] github actions build and add as a release
+- [x] add ansible stuff to nyx
+- [x] ansible: pull a release of the aws cred helper, run with systemd
 - [ ] ansible: pull a release of per-docker-roles, run with systemd

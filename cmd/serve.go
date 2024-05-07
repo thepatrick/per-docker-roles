@@ -6,13 +6,15 @@ import (
 )
 
 var (
-	port int
+	port          int
+	listenAddress string
 )
 
 func init() {
 	rootCmd.AddCommand(serveCmd)
 	// initCredentialsSubCommand(serveCmd)
 	serveCmd.PersistentFlags().IntVar(&port, "port", percontainerroles.DefaultPort, "The port used to run the local server")
+	serveCmd.PersistentFlags().StringVar(&listenAddress, "listen-on", percontainerroles.DefaultLocalHostAddress, "The address to listen on for incoming connections")
 }
 
 var serveCmd = &cobra.Command{
@@ -28,6 +30,6 @@ var serveCmd = &cobra.Command{
 
 		// helper.Debug = credentialsOptions.Debug
 
-		percontainerroles.Serve(port) //, credentialsOptions
+		percontainerroles.Serve(port, listenAddress) //, credentialsOptions
 	},
 }
