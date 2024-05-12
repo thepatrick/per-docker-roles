@@ -142,9 +142,9 @@ func (e *Endpoint) MonitorNetworkEvents(cli *client.Client, ctx context.Context)
 				continue
 			}
 
-			network, ok := inspectedContainer.NetworkSettings.Networks["bridge"]
+			network, ok := inspectedContainer.NetworkSettings.Networks[e.NetworkID]
 			if !ok {
-				log.Println("Container does not have a bridge network")
+				log.Println("Container does not have a", e.NetworkID, "network")
 				continue
 			}
 

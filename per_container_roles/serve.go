@@ -20,6 +20,7 @@ import (
 
 const DefaultLocalHostAddress = "127.0.0.1"
 const DefaultPort = 9912
+const DefaultDockerNetwork = "bridge"
 
 var RefreshTime = time.Minute * time.Duration(5)
 
@@ -45,11 +46,6 @@ func GenerateCredentials(token string, upstreamRoleName string, roleArn string, 
 	if err != nil {
 		return nil, fmt.Errorf("could not get upstream creds: %s", err.Error())
 	}
-
-	// client := s3.New(s3.Options{
-	// 	Region:      "us-west-2",
-	// 	Credentials: aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(accessKey, secretKey, "")),
-	// })
 
 	client := sts.New(sts.Options{
 		Region:      "ap-southeast-2", // TODO: make this configurable
@@ -85,9 +81,9 @@ func GetRemoteIP(r *http.Request) (string, error) {
 	// remoteIP := strings.Split(r.RemoteAddr, ":")[0]
 }
 
-func Serve(port int, listenAddress string) {
+func Serve(port int, listenAddress string, dockerNetwork string) {
 	// todo: specify the network name
-	endpoint := &Endpoint{PortNum: port, NetworkID: "bridge", ByContainer: make(map[string]*ContainerWithCreds)}
+	endpoint := &Endpoint{PortNum: port, NetworkID: dockerNetwork, ByContainer: make(map[string]*ContainerWithCreds)}
 	endpoint.Server = &http.Server{}
 
 	ctx := context.Background()

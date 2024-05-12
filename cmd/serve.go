@@ -8,6 +8,7 @@ import (
 var (
 	port          int
 	listenAddress string
+	dockerNetwork string
 )
 
 func init() {
@@ -15,6 +16,7 @@ func init() {
 	// initCredentialsSubCommand(serveCmd)
 	serveCmd.PersistentFlags().IntVar(&port, "port", percontainerroles.DefaultPort, "The port used to run the local server")
 	serveCmd.PersistentFlags().StringVar(&listenAddress, "listen-on", percontainerroles.DefaultLocalHostAddress, "The address to listen on for incoming connections")
+	serveCmd.PersistentFlags().StringVar(&dockerNetwork, "docker-network", percontainerroles.DefaultDockerNetwork, "The Docker network to use for container discovery")
 }
 
 var serveCmd = &cobra.Command{
@@ -22,14 +24,8 @@ var serveCmd = &cobra.Command{
 	Short: "Serve AWS credentials through a local endpoint",
 	Long:  "Serve AWS credentials through a local endpoint that is compatible with IMDSv2",
 	Run: func(cmd *cobra.Command, args []string) {
-		// err := PopulateCredentialsOptions()
-		// if err != nil {
-		// 	log.Println(err)
-		// 	os.Exit(1)
-		// }
-
 		// helper.Debug = credentialsOptions.Debug
 
-		percontainerroles.Serve(port, listenAddress) //, credentialsOptions
+		percontainerroles.Serve(port, listenAddress, dockerNetwork) //, credentialsOptions
 	},
 }
