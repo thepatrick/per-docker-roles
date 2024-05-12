@@ -2,12 +2,12 @@ package per_container_roles
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -68,17 +68,20 @@ func GenerateCredentials(token string, upstreamRoleName string, roleArn string, 
 	return assumedRole.Credentials, nil
 }
 
-func GetRemoteIP(r *http.Request) (string, error) {
-
-	remoteIP := r.Header.Get("X-Real-IP")
-	if remoteIP == "" {
-		return "", errors.New("unable to process requests without X-Real-IP header")
-	}
+func GetRemoteIPFromRequest(r *http.Request) (string, error) {
+	remoteIP := strings.Split(r.RemoteAddr, ":")[0]
 
 	return remoteIP, nil
+}
 
-	// TODO: real version
-	// remoteIP := strings.Split(r.RemoteAddr, ":")[0]
+func GetRemoteIP(r *http.Request) (string, error) {
+	// remoteIP := r.Header.Get("X-Real-IP")
+	// if remoteIP == "" {
+	// 	return "", errors.New("unable to process requests without X-Real-IP header")
+	// }
+
+	// return remoteIP, nil
+	return GetRemoteIPFromRequest(r)
 }
 
 func Serve(port int, listenAddress string, dockerNetwork string) {
