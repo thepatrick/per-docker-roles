@@ -24,10 +24,6 @@ const DefaultDockerNetwork = "bridge"
 
 var RefreshTime = time.Minute * time.Duration(5)
 
-type SessionToken struct {
-	Expiration time.Time
-}
-
 const TOKEN_RESOURCE_PATH = "/latest/api/token"
 const SECURITY_CREDENTIALS_RESOURCE_PATH = "/latest/meta-data/iam/security-credentials/"
 
