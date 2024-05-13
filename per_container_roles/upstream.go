@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 )
@@ -35,9 +34,6 @@ func VerifyToken(w http.ResponseWriter, r *http.Request) (string, string, error)
 		fmt.Printf("client: error making http request: %s\n", err)
 		return "", "", errors.New(msg)
 	}
-
-	log.Println("VerifyToken: got response!")
-	log.Println("VerifyToken: status code:", res.StatusCode)
 
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -77,8 +73,6 @@ func GetUpstreamCreds(token string, upstreamRoleName string) (RefreshableCred, e
 	if err != nil {
 		return RefreshableCred{}, fmt.Errorf("could not read response body from upstream: %s", err.Error())
 	}
-
-	log.Println("got credentials from upstream:", upstreamCreds)
 
 	return upstreamCreds, nil
 }

@@ -95,8 +95,7 @@ func (e *Endpoint) LoadContainersFromDocker(cli *client.Client, ctx context.Cont
 			log.Println("Container does not have a per-container-role label")
 			continue
 		}
-		// TODO: verify that this works when we abuse NetworkID as a network name vs a network ID
-		// especially when not using the "bridge" network.
+
 		network, ok := inspectedContainer.NetworkSettings.Networks[e.NetworkID]
 		if !ok {
 			log.Println("Container does not have the network:", e.NetworkID)
@@ -125,8 +124,6 @@ func (e *Endpoint) MonitorNetworkEvents(cli *client.Client, ctx context.Context)
 
 	for event := range eventsMessages {
 		if event.Type == "network" && event.Action == "connect" {
-			// log.Println("Network connect event:", event.Actor.Attributes["container"], event.Actor.Attributes["name"], event.Actor.Attributes["role"], event.Actor.Attributes)
-
 			containerId := event.Actor.Attributes["container"]
 
 			inspectedContainer, err := cli.ContainerInspect(ctx, containerId)
@@ -138,13 +135,13 @@ func (e *Endpoint) MonitorNetworkEvents(cli *client.Client, ctx context.Context)
 
 			roleLabel, ok := inspectedContainer.Config.Labels["per-container-role"]
 			if !ok {
-				log.Println("Container does not have a per-container-role label")
+				log.Println("Container does not have a per-container-role label. Container:", containerId)
 				continue
 			}
 
 			network, ok := inspectedContainer.NetworkSettings.Networks[e.NetworkID]
 			if !ok {
-				log.Println("Container does not have a", e.NetworkID, "network")
+				log.Println("Container does not have expected network. Container:", containerId, "Network:", e.NetworkID)
 				continue
 			}
 
@@ -152,10 +149,9 @@ func (e *Endpoint) MonitorNetworkEvents(cli *client.Client, ctx context.Context)
 			e.AddContainer(containerId, roleLabel, network.IPAddress)
 
 		} else if event.Type == "network" && event.Action == "disconnect" {
-			log.Println("Network disconnect event:", event.Actor.Attributes["container"], event.Actor.Attributes["name"], event.Actor.Attributes["role"], event.Actor.Attributes)
-			e.RemoveContainer(event.Actor.Attributes["container"])
-			// } else {
-			// 	log.Println("Event:", event.Type, event.Action, event.Actor)
+			containerId := event.Actor.Attributes["container"]
+			log.Println("Container disconnected. Container:", containerId)
+			e.RemoveContainer(containerId)
 		}
 	}
 

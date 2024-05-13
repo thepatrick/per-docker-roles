@@ -59,8 +59,6 @@ func GenerateCredentials(token string, upstreamRoleName string, roleArn string, 
 		return nil, fmt.Errorf("could not assume role: %s", err.Error())
 	}
 
-	log.Println("Assumed Role:", assumedRole.AssumedRoleUser)
-
 	return assumedRole.Credentials, nil
 }
 
@@ -92,16 +90,16 @@ func Serve(port int, listenAddress string, dockerNetwork string) {
 	}
 	defer cli.Close()
 
-	log.Println("Connected to Docker daemon")
+	log.Println("Serve - Connected to Docker daemon")
 
 	ready, errors := endpoint.ConfigureFromDocker(cli, ctx)
 
 	select {
 	case err := <-errors:
-		log.Println("Error configuring from Docker:", err)
+		log.Println("Serve - Error configuring from Docker:", err)
 		panic(err)
 	case <-ready:
-		log.Println("Basic configuration available, go!")
+		log.Println("Serve - Basic configuration available, go!")
 	}
 
 	putTokenHandler, getRoleNameHandler, getCredentialsHandler := AllIssuesHandlers(endpoint)
@@ -112,7 +110,7 @@ func Serve(port int, listenAddress string, dockerNetwork string) {
 
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", listenAddress, endpoint.PortNum))
 	if err != nil {
-		log.Println("failed to create listener")
+		log.Println("Serve - Error: failed to create listener -", err.Error())
 		os.Exit(1)
 	}
 	endpoint.PortNum = listener.Addr().(*net.TCPAddr).Port
